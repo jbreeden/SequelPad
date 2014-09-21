@@ -12,6 +12,8 @@ SequelPad is essentially just a GUI wrapped around a Ruby interpreter, standard 
 
 [Sequel](http://sequel.jeremyevans.net/) offers conventient mechanisms for database queries, updates, and reflection. However, having the full power of the Ruby language and standard library means you can do much more than just query the database. For example, if your database contained a collection of hostnames, you could `require 'resolv'` and run DNS lookups on each hostname from within SequelPad. That's just one idea, but there's [plenty more](http://ruby-doc.org/stdlib-2.0.0/) you could do with it. It's also a nice alternative to IRB for doing some quick exploratory programming.
 
+When you connect to a database in SequelPad, the global `$db` will be defined with the corresponding Sequel::Database object.
+
 On top of the standard Sequel api, SequelPad adds some conveniences to make scripting easier. For exaple, to get a Dataset for a table named "city" in the schema "public", instead of `$db[:public__city]`, you can just use `public.city`, or even just `city` if public is the default schema on your database. In the context of a SequelPad script, `method_missing` is utilized to try to figure out what you mean. So, if you type a name that is a match for a schema, we'll assume that's what you want. If you call a method on that schema object that's a match for a table name within the schema, you'll get a dataset for that table. All of these matches are case insensitive, which can really speed up writing one-off queries.
 
 Building
