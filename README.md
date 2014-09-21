@@ -3,6 +3,8 @@ SequelPad
 
 Like LINQPad, but for Ruby and Sequel.
 
+![SequlPad Screenshot](/images/SequelPad.PNG?raw=true)
+
 Overview
 --------
 
