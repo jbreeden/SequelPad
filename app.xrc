@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<resource xmlns="http://www.wxwindows.org/wxxrc" version="2.3.0.1">
+	<object class="wxFrame" name="main_frame">
+		<style>wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL</style>
+		<size>963,743</size>
+		<title>SequelPad</title>
+		<centered>1</centered>
+		<aui_managed>0</aui_managed>
+		<object class="wxSplitterWindow" name="m_splitter1">
+			<sashpos>300</sashpos>
+			<gravity>0</gravity>
+			<minsize>0</minsize>
+			<orientation>vertical</orientation>
+			<object class="wxPanel" name="m_panel1">
+				<style>wxTAB_TRAVERSAL</style>
+				<object class="wxBoxSizer">
+					<orient>wxVERTICAL</orient>
+					<object class="sizeritem">
+						<option>1</option>
+						<flag>wxEXPAND | wxALL</flag>
+						<border>5</border>
+						<object class="wxPanel" name="m_panel3">
+							<style>wxSTATIC_BORDER|wxTAB_TRAVERSAL</style>
+							<object class="wxFlexGridSizer">
+								<rows>6</rows>
+								<cols>1</cols>
+								<vgap>0</vgap>
+								<hgap>0</hgap>
+								<growablecols>0</growablecols>
+								<growablerows>0</growablerows>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL|wxEXPAND</flag>
+									<border>5</border>
+									<object class="wxTreeCtrl" name="db_tree_ctrl">
+										<style>wxTR_DEFAULT_STYLE</style>
+									</object>
+								</object>
+							</object>
+						</object>
+					</object>
+				</object>
+			</object>
+			<object class="wxPanel" name="m_panel2">
+				<style>wxTAB_TRAVERSAL</style>
+				<object class="wxBoxSizer">
+					<orient>wxVERTICAL</orient>
+					<object class="sizeritem">
+						<option>1</option>
+						<flag>wxEXPAND</flag>
+						<border>5</border>
+						<object class="wxSplitterWindow" name="m_splitter4">
+							<style>wxSP_3D</style>
+							<sashpos>341</sashpos>
+							<gravity>0</gravity>
+							<minsize>0</minsize>
+							<orientation>horizontal</orientation>
+							<object class="wxPanel">
+								<style>wxSTATIC_BORDER|wxTAB_TRAVERSAL</style>
+								<object class="wxFlexGridSizer">
+									<rows>2</rows>
+									<cols>1</cols>
+									<vgap>0</vgap>
+									<hgap>0</hgap>
+									<growablecols>0</growablecols>
+									<growablerows>1</growablerows>
+									<object class="sizeritem">
+										<option>0</option>
+										<flag>wxALIGN_RIGHT|wxALL</flag>
+										<border>5</border>
+										<object class="wxButton" name="run_button">
+											<label>Run</label>
+											<default>0</default>
+										</object>
+									</object>
+									<object class="sizeritem">
+										<option>1</option>
+										<flag>wxALL|wxEXPAND</flag>
+										<border>5</border>
+										<object class="wxPanel" name="code_editor_panel">
+											<style>wxTAB_TRAVERSAL</style>
+											<object class="wxFlexGridSizer">
+												<rows>1</rows>
+												<cols>1</cols>
+												<vgap>0</vgap>
+												<hgap>0</hgap>
+												<growablecols>0</growablecols>
+												<growablerows>0</growablerows>
+											</object>
+										</object>
+									</object>
+								</object>
+							</object>
+							<object class="wxPanel" name="m_panel6">
+								<style>wxSTATIC_BORDER|wxTAB_TRAVERSAL</style>
+								<bg>#f0f0f0</bg>
+								<object class="wxBoxSizer">
+									<orient>wxVERTICAL</orient>
+									<object class="sizeritem">
+										<option>1</option>
+										<flag>wxEXPAND | wxALL</flag>
+										<border>5</border>
+										<object class="wxNotebook" name="m_notebook1">
+											<style>wxNB_FIXEDWIDTH|wxNB_TOP</style>
+											<bg>#f0f0f0</bg>
+											<fg>#ffffff</fg>
+											<object class="notebookpage">
+												<label>Connection</label>
+												<selected>1</selected>
+												<object class="wxPanel" name="m_panel10">
+													<style>wxTAB_TRAVERSAL</style>
+													<object class="wxGridBagSizer">
+														<vgap>0</vgap>
+														<hgap>0</hgap>
+														<growablecols>1</growablecols>
+														<growablerows></growablerows>
+														<object class="sizeritem">
+															<cellpos>0,0</cellpos>
+															<cellspan>1,1</cellspan>
+															<flag>wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxALL</flag>
+															<border>5</border>
+															<object class="wxStaticText" name="m_staticText6">
+																<label>Host</label>
+																<wrap>-1</wrap>
+															</object>
+														</object>
+														<object class="sizeritem">
+															<cellpos>0,1</cellpos>
+															<cellspan>1,1</cellspan>
+															<flag>wxALL|wxEXPAND</flag>
+															<border>5</border>
+															<object class="wxTextCtrl" name="host_textctrl">
+																<value></value>
+															</object>
+														</object>
+														<object class="sizeritem">
+															<cellpos>1,0</cellpos>
+															<cellspan>1,1</cellspan>
+															<flag>wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxALL</flag>
+															<border>5</border>
+															<object class="wxStaticText" name="m_staticText7">
+																<label>Port</label>
+																<wrap>-1</wrap>
+															</object>
+														</object>
+														<object class="sizeritem">
+															<cellpos>1,1</cellpos>
+															<cellspan>1,1</cellspan>
+															<flag>wxALL|wxEXPAND</flag>
+															<border>5</border>
+															<object class="wxTextCtrl" name="port_textctrl">
+																<value></value>
+															</object>
+														</object>
+														<object class="sizeritem">
+															<cellpos>2,0</cellpos>
+															<cellspan>1,1</cellspan>
+															<flag>wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxALL</flag>
+															<border>5</border>
+															<object class="wxStaticText" name="m_staticText8">
+																<label>Database</label>
+																<wrap>-1</wrap>
+															</object>
+														</object>
+														<object class="sizeritem">
+															<cellpos>2,1</cellpos>
+															<cellspan>1,1</cellspan>
+															<flag>wxALL|wxEXPAND</flag>
+															<border>5</border>
+															<object class="wxTextCtrl" name="database_textctrl">
+																<value></value>
+															</object>
+														</object>
+														<object class="sizeritem">
+															<cellpos>3,0</cellpos>
+															<cellspan>1,1</cellspan>
+															<flag>wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxALL</flag>
+															<border>5</border>
+															<object class="wxStaticText" name="m_staticText9">
+																<label>Username</label>
+																<wrap>-1</wrap>
+															</object>
+														</object>
+														<object class="sizeritem">
+															<cellpos>3,1</cellpos>
+															<cellspan>1,1</cellspan>
+															<flag>wxALL|wxEXPAND</flag>
+															<border>5</border>
+															<object class="wxTextCtrl" name="username_textctrl">
+																<value></value>
+															</object>
+														</object>
+														<object class="sizeritem">
+															<cellpos>4,0</cellpos>
+															<cellspan>1,1</cellspan>
+															<flag>wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxALL</flag>
+															<border>5</border>
+															<object class="wxStaticText" name="m_staticText10">
+																<label>Password</label>
+																<wrap>-1</wrap>
+															</object>
+														</object>
+														<object class="sizeritem">
+															<cellpos>4,1</cellpos>
+															<cellspan>1,1</cellspan>
+															<flag>wxALL|wxEXPAND</flag>
+															<border>5</border>
+															<object class="wxTextCtrl" name="password_textctrl">
+																<value></value>
+															</object>
+														</object>
+														<object class="sizeritem">
+															<cellpos>5,0</cellpos>
+															<cellspan>1,2</cellspan>
+															<flag>wxALIGN_CENTER|wxALL|wxEXPAND</flag>
+															<border>5</border>
+															<object class="wxButton" name="connect_button">
+																<label>Connect</label>
+																<default>0</default>
+															</object>
+														</object>
+													</object>
+												</object>
+											</object>
+											<object class="notebookpage">
+												<label>Results</label>
+												<selected>0</selected>
+												<object class="wxPanel" name="m_panel11">
+													<style>wxTAB_TRAVERSAL</style>
+													<object class="wxFlexGridSizer">
+														<rows>0</rows>
+														<cols>2</cols>
+														<vgap>0</vgap>
+														<hgap>0</hgap>
+														<growablecols>0</growablecols>
+														<growablerows>0</growablerows>
+														<object class="sizeritem">
+															<option>0</option>
+															<flag>wxALL|wxEXPAND</flag>
+															<border>5</border>
+															<object class="wxGrid" name="results_grid" />
+														</object>
+													</object>
+												</object>
+											</object>
+										</object>
+									</object>
+								</object>
+							</object>
+						</object>
+					</object>
+				</object>
+			</object>
+		</object>
+	</object>
+</resource>
