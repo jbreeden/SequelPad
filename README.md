@@ -22,3 +22,29 @@ Building
 This project has only just begun, and there is no binary release yet available. However, you can use the supplied Rakefile to build from scratch. You will also need pre-built copies of Ruby 2.0 (does not currently work with 2.1), wxWidgets 3.0, and [rubydo](https://github.com/jbreeden/rubydo). After updating the Rakefile to have the correct paths for its dependencies on your local machine, just run `rake debug:build`.
 
 If you're building on Windows, I recommend [RubyInstaller](https://github.com/oneclick/rubyinstaller) and TDM-64 >= 4.7.1. Their github page has detailed infromation, but all you need to do is download the repo and run `rake ruby20 DKVER=tdm-64-4.7.1`.
+
+LICENSE
+-------
+
+(The MIT License)
+
+Copyright (c) 2014 Jared Breeden
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+'Software'), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
