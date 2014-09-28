@@ -21,6 +21,8 @@ Try It Out
 
 If you're on Windows, just download the `dist` folder and run SequelPad.exe from that folder.
 
+Note that the distribution provided includes a prebuilt version of Ruby 2.0 from the [RubyInstaller](https://github.com/oneclick/rubyinstaller) project. You can find downloads of the origin Ruby sources & executables at [ruby-lang.org](https://www.ruby-lang.org/en/).
+
 Building
 --------
 
