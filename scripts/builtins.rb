@@ -9,9 +9,6 @@ module App
   include Predefs
   
   def self.connect
-    # Try to open a tcp socket to see if a connection can be made
-    TCPSocket.new($settings[:host], $settings[:port])
-  
     $db = Sequel.connect(
       adapter: 'postgres', 
       host: $settings[:host], 
@@ -20,7 +17,7 @@ module App
       user: $settings[:username], 
       password: $settings[:password]
     )
-    set_schemas(get_schemas)
+    raise "Connection failed" unless $db.test_connection
     save_settings
     true
   rescue Exception => ex
@@ -37,7 +34,11 @@ module App
     $db[:information_schema__schemata].
       select(:schema_name).
       map { |schema| schema[:schema_name] }.
-      reject { |name| name =~ /pg_(toast|temp|catalog)/}
+      reject { |name| name =~ /pg_(toast|temp|catalog)/}.
+      sort
+  rescue Exception => ex
+    alert ex
+    []
   end
   
   def self.get_tables(schema = nil)
@@ -47,6 +48,21 @@ module App
     else
       $db.tables.sort
     end
+  rescue Exception => ex
+    alert ex
+    []
+  end
+  
+  def self.get_views(schema = nil)
+    return [] unless $db
+    if schema
+      $db.views(schema: schema).sort
+    else
+      $db.views.sort
+    end
+  rescue Exception => ex
+    alert ex
+    []
   end
 
   def self.save_settings
@@ -124,6 +140,8 @@ module App
 
 module SequelPad
   class ScriptContext
+    include Predefs
+  
     attr_accessor :db, :logs
     
     # Initiailizes the ScriptContext

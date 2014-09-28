@@ -22,7 +22,7 @@
 						<object class="wxPanel" name="m_panel3">
 							<style>wxSTATIC_BORDER|wxTAB_TRAVERSAL</style>
 							<object class="wxFlexGridSizer">
-								<rows>6</rows>
+								<rows>1</rows>
 								<cols>1</cols>
 								<vgap>0</vgap>
 								<hgap>0</hgap>
@@ -33,7 +33,7 @@
 									<flag>wxALL|wxEXPAND</flag>
 									<border>5</border>
 									<object class="wxTreeCtrl" name="db_tree_ctrl">
-										<style>wxTR_DEFAULT_STYLE</style>
+										<style>wxTR_DEFAULT_STYLE|wxTR_HIDE_ROOT</style>
 									</object>
 								</object>
 							</object>
@@ -51,34 +51,27 @@
 						<border>5</border>
 						<object class="wxSplitterWindow" name="m_splitter4">
 							<style>wxSP_3D</style>
-							<sashpos>341</sashpos>
+							<sashpos>458</sashpos>
 							<gravity>0</gravity>
 							<minsize>0</minsize>
 							<orientation>horizontal</orientation>
 							<object class="wxPanel">
 								<style>wxSTATIC_BORDER|wxTAB_TRAVERSAL</style>
+								<bg>#f0f0f0</bg>
 								<object class="wxFlexGridSizer">
-									<rows>2</rows>
-									<cols>1</cols>
+									<rows>1</rows>
+									<cols>2</cols>
 									<vgap>0</vgap>
 									<hgap>0</hgap>
 									<growablecols>0</growablecols>
-									<growablerows>1</growablerows>
-									<object class="sizeritem">
-										<option>0</option>
-										<flag>wxALIGN_RIGHT|wxALL</flag>
-										<border>5</border>
-										<object class="wxButton" name="run_button">
-											<label>Run</label>
-											<default>0</default>
-										</object>
-									</object>
+									<growablerows>0</growablerows>
 									<object class="sizeritem">
 										<option>1</option>
-										<flag>wxALL|wxEXPAND</flag>
+										<flag>wxEXPAND|wxALL</flag>
 										<border>5</border>
 										<object class="wxPanel" name="code_editor_panel">
 											<style>wxTAB_TRAVERSAL</style>
+											<bg>#f0f0f0</bg>
 											<object class="wxFlexGridSizer">
 												<rows>1</rows>
 												<cols>1</cols>
@@ -86,6 +79,37 @@
 												<hgap>0</hgap>
 												<growablecols>0</growablecols>
 												<growablerows>0</growablerows>
+											</object>
+										</object>
+									</object>
+									<object class="sizeritem">
+										<option>0</option>
+										<flag>wxEXPAND|wxALIGN_CENTER_HORIZONTAL</flag>
+										<border>0</border>
+										<object class="wxToolBar" name="m_toolBar1">
+											<style>wxTB_HORIZONTAL|wxTB_NODIVIDER|wxTB_VERTICAL</style>
+											<size>32,-1</size>
+											<bitmapsize>-1,-1</bitmapsize>
+											<margins></margins>
+											<packing>1</packing>
+											<separation>5</separation>
+											<object class="tool" name="run_tool">
+												<label>Run</label>
+												<tooltip>Run</tooltip>
+												<longhelp></longhelp>
+												<bitmap>icons/play-24.png</bitmap>
+											</object>
+											<object class="tool" name="open_tool">
+												<label>open</label>
+												<tooltip>Open a file</tooltip>
+												<longhelp></longhelp>
+												<bitmap>icons/folder-24.png</bitmap>
+											</object>
+											<object class="tool" name="save_tool">
+												<label>save</label>
+												<tooltip>Save to file</tooltip>
+												<longhelp></longhelp>
+												<bitmap>icons/save-24.png</bitmap>
 											</object>
 										</object>
 									</object>
@@ -251,6 +275,17 @@
 					</object>
 				</object>
 			</object>
+		</object>
+	</object>
+	<object class="wxMenu" name="table_menu">
+		<label>MyMenu</label>
+		<object class="wxMenuItem" name="copy_name_table_menu_item">
+			<label>Copy Name</label>
+			<help></help>
+		</object>
+		<object class="wxMenuItem" name="copy_expression_table_menu_item">
+			<label>Copy Expression</label>
+			<help></help>
 		</object>
 	</object>
 </resource>

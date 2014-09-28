@@ -70,6 +70,17 @@ SequelPadCore::exec_script(const char * code) {
   } END;
 }
 
+std::vector<std::string>
+SequelPadCore::get_schemas () {
+  VALUE result;
+  
+  rubydo::with_gvl DO [&](){
+    result = rb_funcall(RubyModule::define("App").self, rb_intern("get_schemas"), 0);
+  } END;
+  
+  return ruby_array_to_string_vector(result);
+}
+
 std::vector<std::string> 
 SequelPadCore::get_tables (string schema) {
   VALUE result;
@@ -81,6 +92,23 @@ SequelPadCore::get_tables (string schema) {
   } else {
     rubydo::with_gvl DO [&](){
       result = rb_funcall(RubyModule::define("App").self, rb_intern("get_tables"), 1, rb_str_new2(schema.c_str()));
+    } END;
+  }
+  
+  return ruby_array_to_string_vector(result);
+}
+
+std::vector<std::string> 
+SequelPadCore::get_views (string schema) {
+  VALUE result;
+  
+  if (schema == "") {
+    rubydo::with_gvl DO [&](){
+      result = rb_funcall(RubyModule::define("App").self, rb_intern("get_views"), 0);
+    } END;
+  } else {
+    rubydo::with_gvl DO [&](){
+      result = rb_funcall(RubyModule::define("App").self, rb_intern("get_views"), 1, rb_str_new2(schema.c_str()));
     } END;
   }
   
@@ -129,12 +157,6 @@ SequelPadCore::define_app_modules () {
   // App::Grid.auto_size_by_label_width
   grid_module.define_singleton_method("auto_size_by_label_width", [&](VALUE self, int argc, VALUE* argv){
     ui->auto_size_by_label_width();
-    return Qnil;
-  });
-  
-  // App.set_schemas(schema_names)
-  app_module.define_singleton_method("set_schemas", [&](VALUE self, int argc, VALUE* argv){
-    ui->set_schemas(ruby_array_to_string_vector(argv[0]));
     return Qnil;
   });
   

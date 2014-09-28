@@ -16,6 +16,8 @@ public:
   void initialize();
   void ColouriseEditor(wxStyledTextEvent& event);
   void on_run(wxCommandEvent& event);
+  void on_open(wxCommandEvent& event);
+  void on_save(wxCommandEvent& event);
   void on_connect(wxCommandEvent& event);
 
   virtual void clear_results();
@@ -24,7 +26,6 @@ public:
   virtual void refresh_results();
   virtual void auto_size_by_column_width(bool set_as_min);
   virtual void auto_size_by_label_width();
-  virtual void set_schemas(std::vector<std::string> schemas);
   virtual void alert(std::string message);
 
 protected:
@@ -50,6 +51,7 @@ private:
   void create_code_editor();
   void update_core_settings();
   std::vector<wxTextCtrl*> get_connection_text_controls();
+  void populate_db_tree();
 };
 
 #endif // MAINFRAME_H

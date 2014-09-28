@@ -18,7 +18,10 @@ public:
   void exec_script(const char * code);
   void define_app_modules();
   
+  std::vector<std::string> get_schemas();
   std::vector<std::string> get_tables(std::string schema = "");
+  std::vector<std::string> get_views(std::string schema = "");
+  
   void setSchema(std::string value);
   std::string getSchema();
   void setHost(std::string value);

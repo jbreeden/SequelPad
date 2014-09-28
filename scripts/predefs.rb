@@ -10,4 +10,11 @@ module Predefs
 
     table_lengths.sort_by { |table, length| -length }.unshift ["Table", "Length"]
   end
+  
+  def make_aliases(dataset, &block)
+    aliases = dataset.columns.zip(dataset.columns.map(&block)).map do |col, col_alias|
+      Sequel.as(col, col_alias)
+    end
+  end
 end
+

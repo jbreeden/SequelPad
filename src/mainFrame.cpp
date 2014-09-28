@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include "mainFrame.h"
 #include "wx/wx.h"
 #include "wx/utils.h"
@@ -30,7 +31,9 @@ namespace {
 }
 
 BEGIN_EVENT_TABLE(MainFrame, wxFrame)
-  EVT_BUTTON(XRCID("run_button"), MainFrame::on_run)
+  EVT_TOOL(XRCID("run_tool"), MainFrame::on_run)
+  EVT_TOOL(XRCID("open_tool"), MainFrame::on_open)
+  EVT_TOOL(XRCID("save_tool"), MainFrame::on_save)
   EVT_BUTTON(XRCID("connect_button"), MainFrame::on_connect)
 END_EVENT_TABLE()
 
@@ -105,23 +108,6 @@ MainFrame::auto_size_by_label_width () {
   }
 };
 
-void
-MainFrame::set_schemas (std::vector<std::string> schemas) {
-  db_tree_ctrl->DeleteAllItems();
-  auto root = db_tree_ctrl->AddRoot("Schemas");
-  for (string schema: schemas) {
-    cout << "Appending schema: " << schema << endl;
-    auto schema_node = db_tree_ctrl->AppendItem(root, schema);
-    auto tables_node = db_tree_ctrl->AppendItem(schema_node, "Tables");
-    auto views_node = db_tree_ctrl->AppendItem(schema_node, "Views");
-    auto tables = core.get_tables(schema);
-    cout << "Appending tables" << endl;
-    for (auto table : tables) {
-      db_tree_ctrl->AppendItem(tables_node, table);
-    }
-  }
-};
-
 void 
 MainFrame::create_code_editor () {
   code_editor = new wxStyledTextCtrl(code_editor_panel, wxID_ANY);
@@ -137,12 +123,62 @@ MainFrame::create_code_editor () {
   
   wxSizer* sizer = code_editor_panel->GetSizer();
   sizer->Add(code_editor, code_editor_flags);
+  sizer->Layout();
 }
 
 void
 MainFrame::on_run (wxCommandEvent& event) {
   update_core_settings();
   core.exec_script(code_editor->GetValue().c_str());
+}
+
+void 
+MainFrame::on_open (wxCommandEvent& event) {
+  wxFileDialog dialog(
+    this, 
+    "Open Script", 
+    "", // default dir
+    "", // default file
+    "Ruby Files (*.rb)|*.rb",
+    wxFD_OPEN|wxFD_FILE_MUST_EXIST);
+  try {
+    if (wxID_OK == dialog.ShowModal()) {
+      auto file_name = (dialog.GetDirectory() + "/" + dialog.GetFilename()).ToStdString();
+      ifstream in;
+      in.open(file_name);
+      string script((istreambuf_iterator<char>(in)), istreambuf_iterator<char>());
+      code_editor->SetValue(script);
+      in.close();
+    }
+  } catch (...) {
+    alert("Could not read input file.");
+  }
+}
+
+void 
+MainFrame::on_save (wxCommandEvent& event) {
+  wxFileDialog dialog(
+    this, 
+    "Save Script", 
+    "", // default dir
+    "", // default file
+    "Ruby Files (*.rb)|*.rb",
+    wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+  try {
+    if (wxID_OK == dialog.ShowModal()) {
+      auto file_name = (dialog.GetDirectory() + "/" + dialog.GetFilename()).ToStdString();
+      ofstream out;
+      out.open(file_name);
+      auto contents = code_editor->GetValue().ToStdString();
+      for (int i = 0; i < contents.size(); ++i) {
+        if (contents[i] == '\r') continue;
+        out << contents[i];
+      }
+      out.close();
+    }
+  } catch (...) {
+    alert("Could not write output file.");
+  }
 }
 
 void
@@ -169,6 +205,7 @@ MainFrame::on_connect (wxCommandEvent& event) {
     connected = core.connect();
     if (connected) {
       connect_button->SetLabel("Disconnect");
+      populate_db_tree();
     } else {
       enable_all(get_connection_text_controls());
     }
@@ -178,6 +215,26 @@ MainFrame::on_connect (wxCommandEvent& event) {
 vector<wxTextCtrl*> 
 MainFrame::get_connection_text_controls() {
   return {host_textctrl, port_textctrl, database_textctrl, username_textctrl, password_textctrl};
+}
+
+void
+MainFrame::populate_db_tree () {
+  db_tree_ctrl->DeleteAllItems();
+  auto root = db_tree_ctrl->AddRoot("Schemas");
+  auto schemas = core.get_schemas();
+  for (string schema: schemas) {
+    auto schema_node = db_tree_ctrl->AppendItem(root, schema);
+    auto tables_node = db_tree_ctrl->AppendItem(schema_node, "Tables");
+    auto views_node = db_tree_ctrl->AppendItem(schema_node, "Views");
+    auto tables = core.get_tables(schema);
+    auto views = core.get_views(schema);
+    for (auto table : tables) {
+      db_tree_ctrl->AppendItem(tables_node, table);
+    }
+    for (auto view: views) {
+      db_tree_ctrl->AppendItem(views_node, view);
+    }
+  }
 }
 
 void

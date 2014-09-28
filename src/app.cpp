@@ -16,6 +16,7 @@ public:
   virtual bool OnInit() {
     wxApp::OnInit();
     wxXmlResource::Get()->InitAllHandlers();
+    wxImage::AddHandler(new wxPNGHandler);
     wxXmlResource::Get()->Load("app.xrc");
     MainFrame *frame = new MainFrame();
     wxXmlResource::Get()->LoadFrame(frame, NULL, "main_frame");

@@ -12,7 +12,6 @@ public:
   virtual void refresh_results() = 0;
   virtual void auto_size_by_column_width(bool set_as_min) = 0;
   virtual void auto_size_by_label_width() = 0;
-  virtual void set_schemas(std::vector<std::string> schemas) = 0;
   virtual void alert(std::string message) = 0;
 };
 
