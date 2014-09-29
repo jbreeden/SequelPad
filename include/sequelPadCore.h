@@ -16,8 +16,10 @@ public:
   bool connect();
   void disconnect();
   void exec_script(const char * code);
+  void exec_to_file(const char * code, std::string file, int exporter_index);
   void define_sequel_pad_modules();
   
+  std::vector<std::string> get_export_file_types();
   std::vector<std::string> get_schemas();
   std::vector<std::string> get_tables(std::string schema = "");
   std::vector<std::string> get_views(std::string schema = "");

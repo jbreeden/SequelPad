@@ -60,13 +60,39 @@ SequelPadCore::disconnect () {
 
 void
 SequelPadCore::exec_script(const char * code) {
-  VALUE rb_result;
   VALUE rb_script = rb_str_new2(code);
   rubydo::with_gvl DO [&](){
     VALUE sequel_pad_module = RubyModule::define("SequelPad").self;
     rb_funcall(sequel_pad_module, rb_intern("save_settings"), 0);
-    rb_result = rb_funcall(sequel_pad_module, rb_intern("run_script"), 1, rb_script);
+    rb_funcall(sequel_pad_module, rb_intern("run_script"), 1, rb_script);
   } END;
+}
+
+void
+SequelPadCore::exec_to_file(const char * code, string file, int exporter_index) {
+  VALUE rb_script = rb_str_new2(code);
+  rubydo::with_gvl DO [&](){
+    VALUE sequel_pad_module = RubyModule::define("SequelPad").self;
+    rb_funcall(sequel_pad_module, rb_intern("save_settings"), 0);
+    rb_funcall(
+      sequel_pad_module, 
+      rb_intern("exec_to_file"), 
+      3, 
+      rb_script,
+      rb_str_new_cstr(file.c_str()),
+      INT2NUM(exporter_index));
+  } END;
+}
+
+std::vector<std::string> 
+SequelPadCore::get_export_file_types () {
+  VALUE result;
+  
+  rubydo::with_gvl DO [&](){
+    result = rb_funcall(RubyModule::define("SequelPad").self, rb_intern("export_file_types"), 0);
+  } END;
+  
+  return ruby_array_to_string_vector(result);
 }
 
 std::vector<std::string>

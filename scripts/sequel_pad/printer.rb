@@ -5,7 +5,27 @@
 
 module SequelPad
   class Printer
-    def print(results)
+    @@exporters = {}
+    
+    class << self
+      
+      # A subclass should call `exports` to declare that
+      # it can handle the given file_type (Where file_type adheres
+      # to conventions for wildcards as defined by wxWidgets:
+      # http://docs.wxwidgets.org/trunk/classwx_file_dialog.html)
+      #
+      # Example file_type: "CSV Files (*.csv)|*.csv"
+      def exports(file_type)
+        @@exporters[file_type] = self # self will be the runtime class invoking `handle`
+      end
+      
+      def exporters
+        @@exporters
+      end
+    end
+
+    def print(results, file = nil)
+      @file = file
       if results.kind_of? Sequel::Dataset
         print_dataset(results)
       elsif results.kind_of?(Hash)
@@ -17,6 +37,7 @@ module SequelPad
       else
         print_value(results)
       end
+      finished
     end
   
     def print_dataset(results)
@@ -57,7 +78,7 @@ module SequelPad
     
     def print_value(value)
       self.set_columns ['Value']
-      self.add_row([value]);
+      self.add_row([value])
     end
   end
 end

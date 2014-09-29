@@ -67,7 +67,7 @@
 									<growablerows>0</growablerows>
 									<object class="sizeritem">
 										<option>1</option>
-										<flag>wxALL|wxEXPAND</flag>
+										<flag>wxEXPAND|wxALL</flag>
 										<border>5</border>
 										<object class="wxPanel" name="code_editor_panel">
 											<style>wxTAB_TRAVERSAL</style>
@@ -84,7 +84,7 @@
 									</object>
 									<object class="sizeritem">
 										<option>0</option>
-										<flag>wxALIGN_CENTER_HORIZONTAL|wxEXPAND</flag>
+										<flag>wxEXPAND|wxALIGN_CENTER_HORIZONTAL</flag>
 										<border>0</border>
 										<object class="wxToolBar" name="m_toolBar1">
 											<style>wxTB_HORIZONTAL|wxTB_NODIVIDER|wxTB_VERTICAL</style>
@@ -98,6 +98,12 @@
 												<tooltip>Run</tooltip>
 												<longhelp></longhelp>
 												<bitmap>icons/play-24.png</bitmap>
+											</object>
+											<object class="tool" name="write_tool">
+												<label>tool</label>
+												<tooltip>Write results to file</tooltip>
+												<longhelp></longhelp>
+												<bitmap>icons/write-24.png</bitmap>
 											</object>
 											<object class="tool" name="open_tool">
 												<label>open</label>
@@ -273,6 +279,71 @@
 							</object>
 						</object>
 					</object>
+				</object>
+			</object>
+		</object>
+	</object>
+	<object class="wxDialog" name="MyDialog1">
+		<style>wxDEFAULT_DIALOG_STYLE</style>
+		<size>377,139</size>
+		<title></title>
+		<centered>1</centered>
+		<object class="wxGridBagSizer">
+			<vgap>0</vgap>
+			<hgap>0</hgap>
+			<growablecols></growablecols>
+			<growablerows></growablerows>
+			<object class="sizeritem">
+				<cellpos>0,0</cellpos>
+				<cellspan>1,1</cellspan>
+				<flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+				<border>5</border>
+				<object class="wxStaticText" name="m_staticText7">
+					<label>File Type</label>
+					<wrap>-1</wrap>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<cellpos>0,1</cellpos>
+				<cellspan>1,1</cellspan>
+				<flag>wxALL|wxEXPAND</flag>
+				<border>5</border>
+				<object class="wxChoice" name="m_choice2">
+					<selection>0</selection>
+					<content />
+				</object>
+			</object>
+			<object class="sizeritem">
+				<cellpos>1,0</cellpos>
+				<cellspan>1,1</cellspan>
+				<flag>wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxALL</flag>
+				<border>5</border>
+				<object class="wxStaticText" name="m_staticText8">
+					<label>File</label>
+					<wrap>-1</wrap>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<cellpos>1,1</cellpos>
+				<cellspan>1,1</cellspan>
+				<flag>wxALL</flag>
+				<border>5</border>
+				<object class="wxFilePickerCtrl" name="m_filePicker2">
+					<value></value>
+					<message>Select a file</message>
+					<wildcard>*.*</wildcard>
+					<style>wxFLP_DEFAULT_STYLE</style>
+					<size>300,-1</size>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<cellpos>2,0</cellpos>
+				<cellspan>1,2</cellspan>
+				<flag>wxALL|wxEXPAND</flag>
+				<border>5</border>
+				<object class="wxButton" name="m_button2">
+					<label>Write File</label>
+					<default>0</default>
 				</object>
 			</object>
 		</object>

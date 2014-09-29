@@ -16,6 +16,7 @@ public:
   void initialize();
   void ColouriseEditor(wxStyledTextEvent& event);
   void on_run(wxCommandEvent& event);
+  void on_write(wxCommandEvent& event);
   void on_open(wxCommandEvent& event);
   void on_save(wxCommandEvent& event);
   void on_connect(wxCommandEvent& event);

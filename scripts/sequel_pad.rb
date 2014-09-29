@@ -8,6 +8,7 @@ require_relative 'sequel_pad/script_context'
 require_relative 'sequel_pad/schema'
 require_relative 'sequel_pad/printer'
 require_relative 'sequel_pad/gui_printer'
+require_relative 'sequel_pad/html_printer'
 
 # load user-defined scripts
 #Dir[File.dirname(__FILE__) + "/user_scripts/*.rb"].each do |user_script|
@@ -79,12 +80,30 @@ module SequelPad
       PP.pp $settings, f
     end
   end
+  
+  def self.export_file_types
+    Printer.exporters.keys
+  end
 
   def self.run_script (script)
     printer = GuiPrinter.new
     script_context = ScriptContext.new($db)
     results = script_context.instance_eval(script)
     printer.print(results)
+  rescue Exception => ex
+    alert ex
+    nil
+  end
+  
+  def self.exec_to_file (script, file_name, exporter)
+    if exporter.kind_of? Numeric
+      printer = Printer.exporters.values[exporter].new
+    else # Assuming a printer class has been supplied...
+      printer = exporter.new
+    end
+    script_context = ScriptContext.new($db)
+    results = script_context.instance_eval(script)
+    printer.print(results, file_name)
   rescue Exception => ex
     alert ex
     nil

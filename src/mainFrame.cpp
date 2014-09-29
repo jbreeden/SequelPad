@@ -32,6 +32,7 @@ namespace {
 
 BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_TOOL(XRCID("run_tool"), MainFrame::on_run)
+  EVT_TOOL(XRCID("write_tool"), MainFrame::on_write)
   EVT_TOOL(XRCID("open_tool"), MainFrame::on_open)
   EVT_TOOL(XRCID("save_tool"), MainFrame::on_save)
   EVT_BUTTON(XRCID("connect_button"), MainFrame::on_connect)
@@ -130,6 +131,35 @@ void
 MainFrame::on_run (wxCommandEvent& event) {
   update_core_settings();
   core.exec_script(code_editor->GetValue().c_str());
+}
+
+void 
+MainFrame::on_write (wxCommandEvent& event) {
+  auto export_file_types = core.get_export_file_types();
+  string file_types;
+  
+  for (auto file_type : export_file_types) {
+    if (file_types != ""){
+      file_types += "|";
+    }
+    file_types += file_type;
+  }
+  
+  wxFileDialog dialog(
+    this, 
+    "Save Script", 
+    "", // default dir
+    "", // default file
+    file_types,
+    wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+  try {
+    if (wxID_OK == dialog.ShowModal()) {
+      auto file_name = (dialog.GetDirectory() + "/" + dialog.GetFilename()).ToStdString();
+      core.exec_to_file(code_editor->GetValue().c_str(), file_name, dialog.GetFilterIndex());
+    }
+  } catch (...) {
+    alert("Could not write output file.");
+  }
 }
 
 void 

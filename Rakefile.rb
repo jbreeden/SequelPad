@@ -82,7 +82,7 @@ build_target :debug do
     
     object "#{@build_target.name}/obj/resources.o"
       
-    artifact "app.exe"
+    artifact "SequelPad.exe"
   end
   
   copy ["scripts/**/*.rb", "icons/**/*.png", "app.xrc", {ruby_lib_files => ruby_lib_files_dest}]
@@ -92,6 +92,10 @@ build_target :release, :debug do
   compile do
     undefine :DEBUG
     define :RELEASE
+  end
+  
+  link do
+    flag "-mwindows"
   end
 end
 
