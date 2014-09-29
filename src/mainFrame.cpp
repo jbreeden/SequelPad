@@ -139,7 +139,7 @@ MainFrame::on_open (wxCommandEvent& event) {
     "Open Script", 
     "", // default dir
     "", // default file
-    "Ruby Files (*.rb)|*.rb",
+    "Ruby Files (*.rb)|*.rb|All Files (*.*)|*.*",
     wxFD_OPEN|wxFD_FILE_MUST_EXIST);
   try {
     if (wxID_OK == dialog.ShowModal()) {

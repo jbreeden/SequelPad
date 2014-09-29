@@ -16,7 +16,7 @@ public:
   bool connect();
   void disconnect();
   void exec_script(const char * code);
-  void define_app_modules();
+  void define_sequel_pad_modules();
   
   std::vector<std::string> get_schemas();
   std::vector<std::string> get_tables(std::string schema = "");
