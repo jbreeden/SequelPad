@@ -11,9 +11,9 @@ require_relative 'sequel_pad/gui_printer'
 require_relative 'sequel_pad/html_printer'
 
 # load user-defined scripts
-#Dir[File.dirname(__FILE__) + "/user_scripts/*.rb"].each do |user_script|
-#  require user_script
-#end
+Dir[File.dirname(__FILE__) + "/user_scripts/*.rb"].each do |user_script|
+  require user_script
+end
 
 module SequelPad
   
