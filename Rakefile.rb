@@ -20,6 +20,9 @@ ruby_lib_files.exclude "**/*.a"
 ruby_lib_files = ruby_lib_files.select { |f| File.file? f }
 ruby_lib_files_dest = ruby_lib_files.map { |f| f.sub %r[ruby20_mingw/], "" }
 
+ruby_dll = FileList.new "ruby20_mingw/bin/x64-msvcrt-ruby200.dll"
+ruby_dll_dest = ["x64-msvcrt-ruby200.dll"]
+
 # debug build target
 # =================
 
@@ -28,6 +31,7 @@ build_target :debug do
 
   resources_rc = "resources.rc"
   resources_obj = "#{@build_target.name}/obj/resources.o"
+  
   
   file resources_obj => resources_rc do
     sh "windres \"-I#{$WXWIDGETS}/include\" #{resources_rc} #{resources_obj}"
@@ -85,7 +89,7 @@ build_target :debug do
     artifact "SequelPad.exe"
   end
   
-  copy ["scripts/**/*.rb", "icons/**/*.png", "app.xrc", {ruby_lib_files => ruby_lib_files_dest}]
+  copy ["scripts/**/*.rb", "icons/**/*.png", "app.xrc", {ruby_lib_files => ruby_lib_files_dest}, {ruby_dll => ruby_dll_dest}]
 end
 
 build_target :release, :debug do
