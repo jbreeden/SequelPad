@@ -10,10 +10,23 @@ require_relative 'sequel_pad/printer'
 require_relative 'sequel_pad/gui_printer'
 require_relative 'sequel_pad/html_printer'
 
+# Tables required first take precedence
+# ie: flat_array_table & hashes_table can both
+#     represent an array of hashes, but since
+#     hashes_table is required first, it will
+#     be used to generate the table.
+require_relative 'sequel_pad/table'
+require_relative 'sequel_pad/dataset_table'
+require_relative 'sequel_pad/hashes_table'
+require_relative 'sequel_pad/matrix_table'
+require_relative 'sequel_pad/flat_array_table'
+require_relative 'sequel_pad/hash_table'
+require_relative 'sequel_pad/value_table'
+
 # load user-defined scripts
-#Dir[File.dirname(__FILE__) + "/user_scripts/*.rb"].each do |user_script|
-#  require user_script
-#end
+Dir[File.dirname(__FILE__) + "/user_scripts/*.rb"].each do |user_script|
+  require user_script
+end
 
 module SequelPad
   
@@ -40,11 +53,7 @@ module SequelPad
   end
   
   def self.get_schemas
-    $db[:information_schema__schemata].
-      select(:schema_name).
-      map { |schema| schema[:schema_name] }.
-      reject { |name| name =~ /pg_(toast|temp|catalog)/}.
-      sort
+    ScriptContext.new($db).schemas
   rescue Exception => ex
     alert ex
     []
@@ -89,7 +98,8 @@ module SequelPad
     printer = GuiPrinter.new
     script_context = ScriptContext.new($db)
     results = script_context.instance_eval(script)
-    printer.print(results)
+    table = Table.from(results)
+    printer.print(table)
   rescue Exception => ex
     alert ex
     nil
@@ -103,9 +113,10 @@ module SequelPad
     end
     script_context = ScriptContext.new($db)
     results = script_context.instance_eval(script)
-    printer.print(results, file_name)
+    table = Table.from(results)
+    printer.print(table, file_name)
   rescue Exception => ex
-    alert ex
+    alert "#{ex}\n#{ex.backtrace}"
     nil
   end
 end

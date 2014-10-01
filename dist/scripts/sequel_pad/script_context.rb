@@ -19,6 +19,14 @@ module SequelPad
       @logs << message
     end
     
+    def schemas
+      $db[:information_schema__schemata].
+        select(:schema_name).
+        map { |schema| schema[:schema_name] }.
+        reject { |name| name =~ /pg_(toast|temp|catalog)/}.
+        sort
+    end
+    
     # Attempts to locate a schema whose name matches the method being called. If
     # a match is found, a method by that name is defined and invoked, which returns
     # an instance of SequelPad::Schema. Otherwise, NoMethodError is raised.

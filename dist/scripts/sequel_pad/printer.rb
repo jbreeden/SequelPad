@@ -19,66 +19,21 @@ module SequelPad
         @@exporters[file_type] = self # self will be the runtime class invoking `handle`
       end
       
+      def exporter_for(file_type)
+        @@exporters[file_type]
+      end
+      
       def exporters
         @@exporters
       end
     end
 
-    def print(results, file = nil)
-      @file = file
-      if results.kind_of? Sequel::Dataset
-        print_dataset(results)
-      elsif results.kind_of?(Hash)
-        print_hash(results)
-      elsif (results.kind_of?(Array) && results.all? { |r| r.kind_of?(Array) })
-        print_matrix(results)
-      elsif results.kind_of?(Enumerable)
-        print_list(results)
-      else
-        print_value(results)
-      end
+    # file argument not used here, but subclasses that
+    # export files may want to access it
+    def print(table, file = nil)
+      set_columns table.columns
+      table.each { |row| add_row row }
       finished
-    end
-  
-    def print_dataset(results)
-      return if results.count == 0
-      columns = nil
-      results.each do |result|
-        unless columns
-          columns = result.keys
-          self.set_columns columns.map { |col| col.to_s}
-        end
-        
-        self.add_row result.values
-      end
-    end
-    
-    def print_hash(results)
-      self.set_columns ["Key", "Value"]
-      results.each do |e|
-        self.add_row e
-      end
-    end
-    
-    def print_matrix(results)
-      return if results.length == 0
-      col_count = results.max_by { |result| result.count }.count
-      self.set_columns((1..(col_count)).map { |i| i.to_s })
-      results.each do |row|
-        self.add_row row
-      end
-    end
-    
-    def print_list(results)
-      self.set_columns ['Value']
-      results.each do |result|
-        self.add_row [result]
-      end
-    end
-    
-    def print_value(value)
-      self.set_columns ['Value']
-      self.add_row([value])
     end
   end
 end
