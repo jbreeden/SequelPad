@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+svg#graph {
+  overflow: visible;
+  display: block;
+}
+
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.node {
+  font: 10px sans-serif;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 4px;
+}
+
+.link:hover {
+  stroke: black;
+}
+
+svg text {
+  font-size: 10pt;
+}
+
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="data.js"></script>
+<script>
+
+var cluster = d3.layout.cluster().nodeSize([18, 200]);
+var diagonal = d3.svg.diagonal().projection(function(d) { return [d.y, d.x]; });
+var svg = d3.select("body").append("svg").attr("id", "graph");
+var mainGroup = svg.append("g");
+
+function update (data) {
+  cluster.children(function(datum){
+    if (data.constructor.name === 'Array') {
+      var children = data.filter(function(obj){
+        return obj.parent == datum.name;
+      });
+      return children;
+    } else {
+      return datum.children;
+    }
+  });
+
+  var root;
+  if (data.constructor.name === 'Array') {
+    root = data.filter(function (el) { return !(el.parent); })[0];
+  } else {
+    root = data;
+  }
+
+  console.log("root: ");
+  console.log(root);
+  var nodes = cluster.nodes(root),
+      links = cluster.links(nodes);
+
+  var link = mainGroup.selectAll(".link").data(links);
+  var node = mainGroup.selectAll(".node").data(nodes);
+  
+  link.attr("class", "link").attr("d", diagonal);
+  node.attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+  
+  link.enter()
+      .append("path")
+      .attr("class", "link")
+      .attr("d", diagonal);
+
+  var entering_groups = node.enter().append("g")
+      .attr("class", "node")
+      .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+      
+  entering_groups.append("circle")
+      .attr("r", 4.5)
+      
+  entering_groups.append("a")
+      .append("text")
+      .attr("dx", function(d) { return d.children ? -8 : 8; })
+      .attr("dy", 5)
+      .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
+      
+  node.select("a").attr("xlink:href", function (d) { console.log('getting href'); return d.href; })
+      
+  node.select("text").text(function(d) {
+    if (d.label) {
+      return d.label;
+    }
+    return d.name;
+  });
+      
+      
+  node.exit().remove();
+  link.exit().remove();
+  
+  bbox = document.querySelector("svg>g").getBBox();
+  svg.attr("width", bbox.width).attr("height", bbox.height);
+  mainGroup.attr('transform', 'translate(' + -bbox.x + ', ' + -bbox.y + ')');
+}
+
+update(data);
+
+function arrayData() {
+  return [
+    {name: 'root'},
+    {name: 'child1', parent: 'root', label: 'Child #1', href: 'http://google.com'},
+    {name: 'child2', parent: 'root', label: 'Child #2', href: 'http://bing.com'}
+  ];
+}
+
+function myData() {
+  return {
+    name: "Root",
+    children: [
+      {name: "child1"},
+      {name: "child2"}
+    ]
+  }
+}
+
+</script>

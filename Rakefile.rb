@@ -89,7 +89,7 @@ build_target :debug do
     artifact "SequelPad.exe"
   end
   
-  copy ["scripts/**/*.rb", "icons/**/*.png", "app.xrc", {ruby_lib_files => ruby_lib_files_dest}, {ruby_dll => ruby_dll_dest}]
+  copy ["scripts/**/*.*", "icons/**/*.*", "app.xrc", {ruby_lib_files => ruby_lib_files_dest}, {ruby_dll => ruby_dll_dest}]
 end
 
 build_target :release, :debug do

@@ -12,7 +12,7 @@ module SequelPad
     
     def each
       data.each do |row|
-        yield row.values
+        yield data.columns.map { |col| row[col] }
       end
     end
   end

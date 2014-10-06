@@ -116,7 +116,7 @@ module SequelPad
     table = Table.from(results)
     printer.print(table, file_name)
   rescue Exception => ex
-    alert "#{ex}\n#{ex.backtrace}"
+    alert "#{ex}"
     nil
   end
 end

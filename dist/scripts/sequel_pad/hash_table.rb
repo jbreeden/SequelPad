@@ -11,7 +11,7 @@ module SequelPad
     end
   
     def each(&block)
-      yield data.values
+      yield columns.map { |col| data[col] }
     end
   end
 end

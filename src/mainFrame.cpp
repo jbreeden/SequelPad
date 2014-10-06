@@ -36,6 +36,8 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_TOOL(XRCID("open_tool"), MainFrame::on_open)
   EVT_TOOL(XRCID("save_tool"), MainFrame::on_save)
   EVT_BUTTON(XRCID("connect_button"), MainFrame::on_connect)
+  // Can't seem to get lexing & syntax highlighting working yet...
+  //EVT_STC_CHANGE(wxID_ANY, MainFrame::on_editor_change)
 END_EVENT_TABLE()
 
 void 
@@ -116,15 +118,81 @@ MainFrame::create_code_editor () {
   code_editor_flags.Expand();
   
   code_editor->StyleClearAll();
+  code_editor->SetStyleBits(8);
   code_editor->SetLexer(wxSTC_LEX_RUBY);
+  code_editor->SetLexerLanguage("Ruby");
   code_editor->SetMarginType(0, wxSTC_MARGIN_NUMBER);
-  code_editor->SetMarginWidth(0, 15);
+  code_editor->SetMarginWidth(0, 30);
   code_editor->SetTabWidth(2);
   code_editor->SetUseTabs(false);
+  style_code_editor();
   
   wxSizer* sizer = code_editor_panel->GetSizer();
   sizer->Add(code_editor, code_editor_flags);
   sizer->Layout();
+}
+
+void
+MainFrame::style_code_editor () {
+  #define COLOR(num, background, foreground) \
+    code_editor->StyleSetForeground(style_number, foreground); \
+    code_editor->StyleSetBackground (style_number, background);
+    
+  auto background_color = 0x293134;
+
+  // default fonts for all styles
+  int style_number;
+  
+  for (style_number = 0; style_number < wxSTC_STYLE_LASTPREDEFINED; style_number++) {
+      wxFont font (10, wxMODERN, wxNORMAL, wxNORMAL);
+      code_editor->StyleSetFont (style_number, font);
+      //COLOR(style_number, background_color, 0xE0E2E4);
+  }
+  
+  /* Can't seem to get lexing & syntax highlighting working yet...
+  COLOR(wxSTC_RB_DEFAULT, background_color, 0xE0E2E4)
+  COLOR(wxSTC_RB_ERROR, background_color, 0x804000)
+  COLOR(wxSTC_RB_COMMENTLINE, background_color, 0x7D8C93)
+  // What is POD? COLOR(wxSTC_RB_POD, background_color, 0x)
+  COLOR(wxSTC_RB_NUMBER, background_color, 0xFFCD22)
+  COLOR(wxSTC_RB_WORD, background_color, 0xEC7600)
+  COLOR(wxSTC_RB_STRING, background_color, 0xEC7600)
+  COLOR(wxSTC_RB_CHARACTER, background_color, 0xEC7600)
+  COLOR(wxSTC_RB_CLASSNAME, background_color, 0x678CB1)
+  COLOR(wxSTC_RB_DEFNAME, background_color, 0x93C763)
+  COLOR(wxSTC_RB_OPERATOR, background_color, 0xE8E2B7)
+  COLOR(wxSTC_RB_IDENTIFIER, background_color, 0xE0E2E4)
+  COLOR(wxSTC_RB_REGEX, background_color, 0xA082BD)
+  COLOR(wxSTC_RB_GLOBAL, background_color, 0x678CB1)
+  COLOR(wxSTC_RB_SYMBOL, background_color, 0xEC7600)
+  COLOR(wxSTC_RB_MODULE_NAME, background_color, 0x678CB1)
+  COLOR(wxSTC_RB_INSTANCE_VAR, background_color, 0x678CB1)
+  COLOR(wxSTC_RB_CLASS_VAR, background_color, 0x678CB1)
+  COLOR(wxSTC_RB_BACKTICKS, background_color, 0xEC7600)
+  COLOR(wxSTC_RB_DATASECTION, background_color, 0xEC7600)
+  COLOR(wxSTC_RB_HERE_DELIM, background_color, 0xEC7600)
+  COLOR(wxSTC_RB_HERE_Q, background_color, 0xEC7600)
+  COLOR(wxSTC_RB_HERE_QQ, background_color, 0xEC7600)
+  COLOR(wxSTC_RB_HERE_QX, background_color, 0xEC7600)
+  COLOR(wxSTC_RB_STRING_Q, background_color, 0xEC7600)
+  COLOR(wxSTC_RB_STRING_QQ, background_color, 0xEC7600)
+  COLOR(wxSTC_RB_STRING_QX, background_color, 0xEC7600)
+  COLOR(wxSTC_RB_STRING_QR, background_color, 0xEC7600)
+  COLOR(wxSTC_RB_STRING_QW, background_color, 0xEC7600)
+  COLOR(wxSTC_RB_WORD_DEMOTED, background_color, 0xEC7600)
+  COLOR(wxSTC_RB_STDIN, background_color, 0x678CB1)
+  COLOR(wxSTC_RB_STDOUT, background_color, 0x678CB1)
+  COLOR(wxSTC_RB_STDERR, background_color, 0x678CB1)
+  COLOR(wxSTC_RB_UPPER_BOUND, background_color, 0x678CB1)
+  */
+  #undef COLOR
+}
+
+void 
+MainFrame::on_editor_change(wxStyledTextEvent& event){
+  /* Can't seem to get lexing & syntax highlighting working yet...
+  code_editor->Colourise(0, length);
+  */
 }
 
 void
