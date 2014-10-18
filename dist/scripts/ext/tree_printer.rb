@@ -1,6 +1,6 @@
 module SequelPad
-  class DendogramPrinter < Printer
-    exports "Dendogram (*.html)|*.html"
+  class TreePrinter < Printer
+    exports "Tree (*.html)|*.html"
     
     def print(table, file = nil)
       @file = file
@@ -15,7 +15,7 @@ module SequelPad
       end
       
       unless required_columns_present
-        raise "Dendogram export requires columns: #{required_columns.join ', '}"
+        raise "Tree export requires columns: #{required_columns.join ', '}"
       end
     end
     
@@ -53,7 +53,7 @@ module SequelPad
     end
     
     def erb_file_name
-      "#{File.dirname(__FILE__)}/dendogram_printer/dendogram.erb"
+      "#{File.dirname(__FILE__)}/tree_printer/tree.erb"
     end
   end
 end

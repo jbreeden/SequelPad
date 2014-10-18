@@ -87,10 +87,12 @@ module RakeGcc
         self.after_block.call() if self.after_block
       end
       
+      desc "Build the #{@name} target"
       task :build => [all_directories, :before, :compile, link_artifact, copied_files, :after].flatten do
         puts "Build Complete"
       end
       
+      desc "Clean the #{@name} target"
       task :clean do
         rm_rf name.to_s
       end
@@ -109,11 +111,25 @@ module RakeGcc
     end
     
     def define_link_artifact_task(obj_files)
+      if link_artifact =~ /lib.*\.a$/i
+        define_static_library_artifact_task(obj_files)
+      else
+        define_exe_artifact_task(obj_files)
+      end
+    end
+    
+    def define_exe_artifact_task(obj_files)
       file link_artifact => (@link_task_dependencies + obj_files) do
         flags = @link_options.flags.join(' ')
         link_libraries = @link_options.libs.map { |lib| "-l#{lib}" }.join(' ')
         search_path = @link_options.dirs.map { |dir| "-L#{dir}" }.join(' ')
-        sh "#{@compiler} #{flags} #{search_path} #{obj_files.join(' ')} #{link_libraries} -o #{name}/#{@link_options.artifact}"
+        sh "#{@compiler} #{flags} #{search_path} #{obj_files.join(' ')} #{link_libraries} -o #{link_artifact}"
+      end
+    end
+    
+    def define_static_library_artifact_task(obj_files)
+      file link_artifact => (@link_task_dependencies + obj_files) do
+        sh "ar -r #{link_artifact} #{obj_files.join(' ')}"
       end
     end
     
@@ -206,13 +222,13 @@ module RakeGcc
     end
     
     def compile(*dependencies, &block)
-      @build_target.compile_task_dependencies += dependencies.flatten
+      @build_target.compile_task_dependencies = dependencies.flatten
       compile_context = CompileDslContext.new(@build_target)
       compile_context.instance_eval &block
     end
     
     def link(*dependencies, &block)
-      @build_target.link_task_dependencies += dependencies.flatten
+      @build_target.link_task_dependencies = dependencies.flatten
       link_context = LinkDslContext.new(@build_target)
       link_context.instance_eval &block
     end
@@ -239,17 +255,22 @@ module RakeGcc
       @compile_options = build_target.compile_options
     end
     
+    def depend(*dependencies)
+      @build_target.compile_task_dependencies += dependencies.flatten
+    end
+    
+    def clear_dependencies
+      @build_target.compile_task_dependencies = []
+    end
+    
     def flags(*args)
       args = args.flatten
       @compile_options.flags += args
     end
     alias flag flags
     
-    def dont_flag(*args)
-      args = args.flatten
-      @compile_options.flags = @compile_options.flags.reject do |old_flag|
-        args.any? { |arg| arg == old_flag }
-      end
+    def clear_flags
+      @compile_options.flags = []
     end
     
     def define(*args)
@@ -265,16 +286,17 @@ module RakeGcc
     end
     alias undefine dont_define
     
+    def clear_defines
+      @compile_options.defines = []
+    end
+    
     def search(*args)
       args = args.flatten
       args.each { |arg| @compile_options.include_dirs.add arg }
     end
     
-    def dont_search(*args)
-      args = args.flatten
-      @compile_options.include_dirs = @compile_options.include_dirs.reject do |old_search|
-        args.any? { |arg| arg == old_search }
-      end
+    def clear_search_path
+      @compile_options.include_dirs = Rake::FileList.new
     end
     
     def sources(*args)
@@ -282,6 +304,10 @@ module RakeGcc
       args.each { |arg| @compile_options.sources.add arg }
     end
     alias source sources
+    
+    def clear_sources
+      @compile_options.sources = Rake::FileList.new
+    end
   end
   
   class LinkOptions
@@ -305,15 +331,31 @@ module RakeGcc
       @link_options = build_target.link_options
     end
     
+    def depend(*dependencies)
+      @build_target.link_task_dependencies += dependencies.flatten
+    end
+    
+    def clear_dependencies
+      @build_target.link_task_dependencies = []
+    end
+    
     def flags(*args)
       args = args.flatten
       @link_options.flags += args
     end
     alias flag flags
     
+    def clear_flags
+      @link_options.flags = []
+    end
+    
     def search(*args)
       args = args.flatten
       @link_options.dirs.add args
+    end
+    
+    def clear_search_path
+      @link_options.dirs = Rake::FileList.new
     end
     
     def libs(*args)
@@ -322,6 +364,10 @@ module RakeGcc
     end
     alias lib libs
     
+    def clear_libs
+      @link_options.libs = []
+    end
+    
     def object(*args)
       args = args.flatten
       @link_options.object_files += args
@@ -329,6 +375,11 @@ module RakeGcc
     alias objects object
     alias object_file object
     alias object_files object
+    
+    def clear_objects
+      @link_options.object_files = []
+    end
+    alias clear_object_files clear_objects
     
     def artifact(name)
       @link_options.artifact = name

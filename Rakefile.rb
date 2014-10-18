@@ -4,7 +4,7 @@ include RakeGcc
 task :default => "debug:build"
 
 # Global Build tool configuration
-# ======================
+# ===============================
 
 $CPP = ENV['CPP'] || "g++"
 $CC = ENV['CC'] || "gcc"
@@ -24,7 +24,7 @@ ruby_dll = FileList.new "ruby20_mingw/bin/x64-msvcrt-ruby200.dll"
 ruby_dll_dest = ["x64-msvcrt-ruby200.dll"]
 
 # debug build target
-# =================
+# ==================
 
 build_target :debug do
   compiler $CPP
@@ -60,7 +60,7 @@ build_target :debug do
     search [
       "#{$WXWIDGETS}/lib/gcc_lib",
       "#{$RUBY}/lib",
-      "#{$RUBYDO}/Release"
+      "#{$RUBYDO}/release"
     ]
     
     libs [
@@ -92,6 +92,9 @@ build_target :debug do
   copy ["scripts/**/*.*", "icons/**/*.*", "app.xrc", {ruby_lib_files => ruby_lib_files_dest}, {ruby_dll => ruby_dll_dest}]
 end
 
+# Release Build Target
+# ====================
+
 build_target :release, :debug do
   compile do
     undefine :DEBUG
@@ -103,8 +106,8 @@ build_target :release, :debug do
   end
 end
 
-# Dist Configuration Tasks
-# ==================
+# Dist Build Target
+# =================
 
 namespace :dist do
   directory "dist"
@@ -114,18 +117,27 @@ namespace :dist do
   end
   
   task :build => ["clean", "release:build", "dist"] do
-    Dir["Release/*"].each do |file|
+    Dir["release/*"].each do |file|
       next if File.basename(file) == "obj"
       if File.directory?(file)
-        cp_r file, "Dist/#{File.basename file}"
+        cp_r file, "dist/#{File.basename file}"
       elsif File.file?(file)
-        cp file, "Dist/#{File.basename file}"
+        cp file, "dist/#{File.basename file}"
       end
     end
     
-    Dir["Dist/**/*.{o,exe,dll,so}"].each do |binary|
+    Dir["dist/**/*.{o,exe,dll,so}"].each do |binary|
       sh "strip --strip-unneeded #{binary}"
     end
   end
 end
 
+# Clean Task
+# ==========
+
+desc "Clean all build targets"
+task :clean do
+  rm_rf "debug" if File.exists? 'debug'
+  rm_rf "release" if File.exists? 'release'
+  rm_rf "dist" if File.exists? 'dist'
+end

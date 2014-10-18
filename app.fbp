@@ -899,7 +899,7 @@
                                                                     <property name="name">run_tool</property>
                                                                     <property name="permission">protected</property>
                                                                     <property name="statusbar"></property>
-                                                                    <property name="tooltip">Run</property>
+                                                                    <property name="tooltip">Run (F5)</property>
                                                                     <event name="OnAuiToolBarBeginDrag"></event>
                                                                     <event name="OnAuiToolBarMiddleClick"></event>
                                                                     <event name="OnAuiToolBarOverflowClick"></event>

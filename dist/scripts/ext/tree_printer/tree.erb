@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+svg#graph {
+  overflow: hidden;
+  display: block;
+  border-style: solid;
+  border-width: 20px;
+  border-color: transparent;
+}
+
+#backdrop {
+  fill: transparent;
+}
+
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.node {
+  font: 10px sans-serif;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 4px;
+}
+
+.border {
+  fill: none;
+  stroke: black;
+  stroke-width: 4px;
+  opacity: .3;
+}
+
+.border.bottom {
+  cursor: ns-resize;
+}
+
+.border.right {
+  cursor: ew-resize;
+}
+
+.link:hover {
+  stroke: black;
+}
+
+svg text {
+  font-size: 10pt;
+}
+
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.js"></script>
+<script>
+
+var data = [
+<% rows.each do |row| -%>
+  {
+<%   row.each_with_index do |el, i| -%>
+    "<%= columns[i] %>": <%= el.nil? ? 'undefined' : "\"#{el}\""%>,
+<%   end -%>
+  },
+<% end -%>
+];
+
+data.forEach(function(d){
+  d.dx = 0;
+  d.dy = 0;
+  d.expanded = true;
+  d.hidden = false;
+});
+
+var svg_element = d3.select("body").append("svg").attr("id", "graph");
+var root = data.filter(function (el) { return !(el.parent); })[0];
+var tree = new Tree(svg_element);
+tree.update(root);
+
+function Tree (svg) {
+  var padding = 20;
+  var tree = d3.layout.tree().nodeSize([50, 200]);
+  var backdrop = svg.append('rect').attr('id', 'backdrop');
+  var mainGroup = svg.append("g").attr('class', 'mainGroup');
+  var linkLayer = mainGroup.append("g").attr("class", "linkLayer");
+  var nodeLayer = mainGroup.append("g").attr("class", "nodeLayer");
+
+  tree.sort(function (d1, d2) { return d3.ascending(d1.label, d2.label); });
+  
+  tree.children(function(datum){
+    if (datum.children) return datum.children;
+    return data.filter(function(obj){
+      return obj.parent == datum.name;
+    });
+  });
+
+  // If the `root` argument is supplied, recomputes
+  // the layout and returns the links & nodes data.
+  // If `root` is not supplied, returns the previously
+  // computed layout. (Valid if data set has not changed.)
+  function getLayout(root) {
+    if (root) {
+      getLayout.nodes = tree.nodes(root);
+      getLayout.links = tree.links(getLayout.nodes);
+    }
+    return {
+      nodes: getLayout.nodes,
+      links: getLayout.links
+    };
+  }
+  
+  // Drag behavior re-computed dx & dy for the subtree from where
+  // the event occurred and calls update
+  var drag = d3.behavior.drag();
+  
+  drag.on('dragstart', function (d) {
+    drag.x = d3.event.sourceEvent.x;
+    drag.y = d3.event.sourceEvent.y;
+  
+    drag.affectedSet = [d];
+    drag.affectedSet = drag.affectedSet.concat(getDescendants(d));
+  });
+  
+  drag.on('drag', function (d) {
+    if (d.name == 'root') {
+      var x = d3.event.sourceEvent.x;
+      var y = d3.event.sourceEvent.y;
+      dx = x - drag.x;
+      dy = y - drag.y;
+      translateMainGroup(dx, dy);
+      drag.x = x;
+      drag.y = y;
+      return;
+    }
+  
+    drag.affectedSet.forEach(function (d) {
+      d.dx += d3.event.dx;
+      d.dy += d3.event.dy;
+    });
+    update(null, drag.affectedSet);
+  });
+  
+  function showChildren(d, shouldShow) {
+    recurse(d, shouldShow);
+    
+    function recurse (d, shouldShow){
+      if (d.children) {
+        d.children.forEach(function (child) {
+          child.hidden = !shouldShow;
+          if (child.expanded){
+            showChildren(child, shouldShow);
+          }
+        });
+      }
+    }
+  }
+  
+  function getDescendants(d) {
+    descendants = [];
+    gatherChildren(d);
+    return descendants;
+    
+    function gatherChildren(datum) {
+      if (datum.children) {
+        datum.children.forEach(function (child) {
+          descendants.push(child);
+          gatherChildren(child);
+        });
+      }
+    }
+  }
+  
+  // Calculates a path definition for a `link`.
+  // The default d3.svg.diagonal function would be fine,
+  // except that our nodes are draggable, so their
+  // dx & dy memebers must be considered.
+  function diagonal(link) {
+    var from_x = link.source.x + link.source.dx;
+    var from_y = link.source.y + link.source.dy;
+    var to_x = link.target.x + link.target.dx;
+    var to_y = link.target.y + link.target.dy;
+    
+    var from_point = from_x + ',' + from_y;
+    var to_point = to_x + ',' + to_y;
+    var control_y = from_y + ((to_y - from_y) / 2);
+    var control_point_1 = from_x + ',' + control_y;
+    var control_point_2 = to_x + ',' + control_y;
+  
+    var move_to_start = 'M' + from_point;
+    var curve_to_end = 'C' + control_point_1 + ' ' + control_point_2 + ' ' + to_point;
+    
+    return move_to_start + curve_to_end;
+  }
+  
+  function enterElements(node, link) {
+    link.enter().append("path")
+      .attr("class", "link");
+      
+    var nodeEnter = node.enter().append("g").attr("class", "node").call(drag);
+    
+    var newCircle = nodeEnter.append("circle")
+        .on('dblclick', function(d) {
+          d.expanded = !d.expanded;
+          showChildren(d, d.expanded);
+          update();
+        });
+        
+    nodeEnter.append("a").append("text");
+  }
+  
+  function updateElements(node, link) {
+    link.attr("d", diagonal);
+    link.style('visibility', function (d) {
+      return (d.target.hidden ? 'hidden' : 'visible');
+    });
+        
+    node.attr("transform", function(d) {
+      return "translate(" + (d.x + d.dx) + "," + (d.y + d.dy) + ")"; 
+    });
+    
+    node.style('visibility', function (d) {
+      return (d.hidden ? 'hidden' : 'visible');
+    });
+        
+    node.select('circle')
+      .attr("r", 6)
+      .style("stroke", function(d){ if (d.color) return d.color; })
+      .style("fill", function (d) { 
+        if (d.expanded) return;
+        return d.color ? d.color : 'steelblue';
+      });
+        
+    node.select('text').attr("dx", function(d) { return !d.parent ? -10 : 10; })
+        .attr("dy", 5)
+        .attr('transform', function (d) {
+          if (d.parent) return 'rotate(25)';
+        })
+        .style("text-anchor", function(d) { 
+          if (!d.parent) return 'end';
+          return 'start'; 
+        })
+        
+    node.select("a").attr("xlink:href", function (d) { return d.href; })
+        
+    node.select("text").text(function(d) {
+      if (d.label) {
+        return d.label;
+      }
+      return d.name;
+    });
+  }
+  
+  function exitElements(node, link) {
+    node.exit().remove();
+    link.exit().remove();
+  }
+
+  // Update the tree.
+  // - `root` parameter should be supplied if and only if
+  // the data set has changed. (Though, it doesn't hurt
+  // to supply it just in case, if you're unsure. It
+  // will simply cause the layout to be re-calculated.
+  // which may be unnecessary, but is fast.)
+  // - `updateSet` is optionally supplied as an array of data
+  // elements which are the only ones that should be updated.
+  function update(root, updateSet) {
+    var layout = getLayout(root);
+    var link = linkLayer.selectAll(".link").data(layout.links);
+    var node = nodeLayer.selectAll(".node").data(layout.nodes, function (d) { return d.name });
+    
+    if (updateSet) {
+      node = node.filter(function() {
+        var nodeData = this.__data__;
+        return updateSet.some(function (datum) {
+          return nodeData == datum;
+        });
+      });
+      link = link.filter(function() {
+        var linkSource = this.__data__.source;
+        var linkTarget = this.__data__.target;
+        return updateSet.some(function (datum) {
+          return linkSource == datum || linkTarget == datum;
+        });
+      });
+    } else {
+      enterElements(node, link);
+    }
+    
+    updateElements(node, link);
+    
+    if(!updateSet) {
+      exitElements(node, link);
+    }
+    
+    if(!update.alreadySized) {
+      size();
+      drawBorder();
+      update.alreadySized = true;
+    }
+  }
+  
+  function size() {
+    var nodeBox = nodeLayer[0][0].getBBox();
+    var linkBox = linkLayer[0][0].getBBox();
+    var left_x = Math.min(nodeBox.x, linkBox.x);
+    var width = Math.max(nodeBox.width, linkBox.width) + (padding * 2);
+    var height = Math.max(nodeBox.height, linkBox.height) + (padding * 2);
+    svg.attr("width", width).attr("height", height);
+    backdrop.attr('x', 0).attr('y', 0).attr('width', width).attr('height', height);
+    translateMainGroup((-left_x + padding), padding);
+  }
+  
+  function resize(width, height) {
+    svg.attr('height', height);
+    svg.attr('width', width);
+    backdrop.attr('height', height);
+    backdrop.attr('width', width);
+  }
+  
+  function translateMainGroup(x, y) {
+    translateMainGroup.x = translateMainGroup.x || 0;
+    translateMainGroup.y = translateMainGroup.y || 0;
+    translateMainGroup.x += x;
+    translateMainGroup.y += y;
+    mainGroup.attr('transform', 'translate(' + translateMainGroup.x + ', ' + translateMainGroup.y + ')');
+  }
+  
+  var backdropDrag = d3.behavior.drag()
+  backdropDrag.on('drag', function (d) {
+    console.log('dragging backdrop');
+    translateMainGroup(d3.event.dx, d3.event.dy);
+  });
+  
+  backdrop.call(backdropDrag);
+  
+  var borderDrag = d3.behavior.drag();
+  borderDrag.on('dragstart', function (d) {
+    borderDrag.width = parseInt(svg.attr('width'));
+    borderDrag.height = parseInt(svg.attr('height'));
+  });
+  borderDrag.on('drag', function (d) {
+    if (d.name == 'bottom') {
+      borderDrag.height = borderDrag.height + d3.event.dy;
+    } else if (d.name == 'right') {
+      borderDrag.width = borderDrag.width + d3.event.dx;
+    }
+    resize(borderDrag.width, borderDrag.height);
+    drawBorder();
+  });
+  
+  function drawBorder() {
+    var container = svg[0][0];
+    var width = parseInt(container.getAttribute('width'));
+    var height = parseInt(container.getAttribute('height'));
+    data = [
+      {x: 0, y: 0, name: 'top'},
+      {x: width, y: 0, name: 'right'},
+      {x: width, y: height, name: 'bottom'},
+      {x: 0, y: height, name: "left"}
+    ];
+    // Loop unfolding... highly optimized
+    data[0].next = data[1];
+    data[1].next = data[2];
+    data[2].next = data[3];
+    data[3].next = data[0];
+    var borderLines = svg.selectAll('.border').data(data);
+    borderLines.enter().append('path').attr('class', function(d){ return "border " + d.name; });
+    borderLines.attr('d', function (d) {
+      return 'M' + d.x + ',' + d.y + 'L' + d.next.x + ',' + d.next.y;
+    }).call(borderDrag);
+  }
+  
+  return { update: update };
+}
+</script>

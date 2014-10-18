@@ -34,44 +34,44 @@ void
 SequelPadCore::initialize (SequelPadUi* ui) {
   this->ui = ui;
   
-  rubydo::with_gvl DO [&](){
+  rubydo::with_gvl([&](){
     run_init_scripts();
     define_sequel_pad_modules();
-  } END;
+  });
 }
 
 bool
 SequelPadCore::connect () {
   bool result;
-  rubydo::with_gvl DO [&](){
+  rubydo::with_gvl([&](){
     result = RTEST(
       rb_funcall(RubyModule::define("SequelPad").self, rb_intern("connect"), 0)
     );
-  } END;
+  });
   return result;
 }
 
 void
 SequelPadCore::disconnect () {
-  rubydo::with_gvl DO [&](){
+  rubydo::with_gvl([&](){
     rb_funcall(RubyModule::define("SequelPad").self, rb_intern("disconnect"), 0);
-  } END;
+  });
 }
 
 void
 SequelPadCore::exec_script(const char * code) {
   VALUE rb_script = rb_str_new2(code);
-  rubydo::with_gvl DO [&](){
+  rubydo::with_gvl([&](){
     VALUE sequel_pad_module = RubyModule::define("SequelPad").self;
     rb_funcall(sequel_pad_module, rb_intern("save_settings"), 0);
     rb_funcall(sequel_pad_module, rb_intern("run_script"), 1, rb_script);
-  } END;
+  });
 }
 
 void
 SequelPadCore::exec_to_file(const char * code, string file, int exporter_index) {
   VALUE rb_script = rb_str_new2(code);
-  rubydo::with_gvl DO [&](){
+  rubydo::with_gvl([&](){
     VALUE sequel_pad_module = RubyModule::define("SequelPad").self;
     rb_funcall(sequel_pad_module, rb_intern("save_settings"), 0);
     rb_funcall(
@@ -81,16 +81,16 @@ SequelPadCore::exec_to_file(const char * code, string file, int exporter_index) 
       rb_script,
       rb_str_new_cstr(file.c_str()),
       INT2NUM(exporter_index));
-  } END;
+  });
 }
 
 std::vector<std::string> 
 SequelPadCore::get_export_file_types () {
   VALUE result;
   
-  rubydo::with_gvl DO [&](){
+  rubydo::with_gvl([&](){
     result = rb_funcall(RubyModule::define("SequelPad").self, rb_intern("export_file_types"), 0);
-  } END;
+  });
   
   return ruby_array_to_string_vector(result);
 }
@@ -99,9 +99,9 @@ std::vector<std::string>
 SequelPadCore::get_schemas () {
   VALUE result;
   
-  rubydo::with_gvl DO [&](){
+  rubydo::with_gvl([&](){
     result = rb_funcall(RubyModule::define("SequelPad").self, rb_intern("get_schemas"), 0);
-  } END;
+  });
   
   return ruby_array_to_string_vector(result);
 }
@@ -111,13 +111,13 @@ SequelPadCore::get_tables (string schema) {
   VALUE result;
   
   if (schema == "") {
-    rubydo::with_gvl DO [&](){
+    rubydo::with_gvl([&](){
       result = rb_funcall(RubyModule::define("SequelPad").self, rb_intern("get_tables"), 0);
-    } END;
+    });
   } else {
-    rubydo::with_gvl DO [&](){
+    rubydo::with_gvl([&](){
       result = rb_funcall(RubyModule::define("SequelPad").self, rb_intern("get_tables"), 1, rb_str_new2(schema.c_str()));
-    } END;
+    });
   }
   
   return ruby_array_to_string_vector(result);
@@ -128,13 +128,13 @@ SequelPadCore::get_views (string schema) {
   VALUE result;
   
   if (schema == "") {
-    rubydo::with_gvl DO [&](){
+    rubydo::with_gvl([&](){
       result = rb_funcall(RubyModule::define("SequelPad").self, rb_intern("get_views"), 0);
-    } END;
+    });
   } else {
-    rubydo::with_gvl DO [&](){
+    rubydo::with_gvl([&](){
       result = rb_funcall(RubyModule::define("SequelPad").self, rb_intern("get_views"), 1, rb_str_new2(schema.c_str()));
-    } END;
+    });
   }
   
   return ruby_array_to_string_vector(result);
@@ -199,18 +199,18 @@ SequelPadCore::define_sequel_pad_modules () {
 void \
 SequelPadCore::setter (string value) { \
   const char * value_cstr = value.c_str(); \
-  rubydo::with_gvl DO [&](){ \
+  rubydo::with_gvl([&](){ \
     rb_funcall(rb_gv_get("$settings"), rb_intern("[]="), 2, ID2SYM(rb_intern(#rb_name)), rb_str_new2(value_cstr) ); \
-  } END; \
+  }); \
 } \
 \
 string \
 SequelPadCore::getter () { \
   string value; \
-  rubydo::with_gvl DO [&](){ \
+  rubydo::with_gvl([&](){ \
     VALUE rb_string = rb_funcall(rb_gv_get("$settings"), rb_intern("[]"), 1, ID2SYM(rb_intern(#rb_name))); \
     value = StringValueCStr(rb_string); \
-  } END; \
+  }); \
   return value; \
 }
 

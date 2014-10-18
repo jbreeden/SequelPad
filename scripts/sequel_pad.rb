@@ -6,25 +6,25 @@ require 'sequel'
 require 'socket'
 require_relative 'sequel_pad/script_context'
 require_relative 'sequel_pad/schema'
-require_relative 'sequel_pad/printer'
-require_relative 'sequel_pad/gui_printer'
-require_relative 'sequel_pad/html_printer'
+require_relative 'sequel_pad/printers/printer'
+require_relative 'sequel_pad/printers/gui_printer'
+require_relative 'sequel_pad/printers/html_printer'
 
 # Tables required first take precedence
 # ie: flat_array_table & hashes_table can both
 #     represent an array of hashes, but since
 #     hashes_table is required first, it will
 #     be used to generate the table.
-require_relative 'sequel_pad/table'
-require_relative 'sequel_pad/dataset_table'
-require_relative 'sequel_pad/hashes_table'
-require_relative 'sequel_pad/matrix_table'
-require_relative 'sequel_pad/flat_array_table'
-require_relative 'sequel_pad/hash_table'
-require_relative 'sequel_pad/value_table'
+require_relative 'sequel_pad/tables/table'
+require_relative 'sequel_pad/tables/dataset_table'
+require_relative 'sequel_pad/tables/hashes_table'
+require_relative 'sequel_pad/tables/matrix_table'
+require_relative 'sequel_pad/tables/flat_array_table'
+require_relative 'sequel_pad/tables/hash_table'
+require_relative 'sequel_pad/tables/value_table'
 
 # load user-defined scripts
-Dir[File.dirname(__FILE__) + "/user_scripts/*.rb"].each do |user_script|
+Dir[File.dirname(__FILE__) + "/ext/*.rb"].each do |user_script|
   require user_script
 end
 
@@ -113,8 +113,7 @@ module SequelPad
     end
     script_context = ScriptContext.new($db)
     results = script_context.instance_eval(script)
-    table = Table.from(results)
-    printer.print(table, file_name)
+    printer.print(results, file_name)
   rescue Exception => ex
     alert "#{ex}"
     nil

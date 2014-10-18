@@ -197,6 +197,11 @@ MainFrame::on_editor_change(wxStyledTextEvent& event){
 
 void
 MainFrame::on_run (wxCommandEvent& event) {
+  run();
+}
+
+void
+MainFrame::run () {
   update_core_settings();
   core.exec_script(code_editor->GetValue().c_str());
 }
