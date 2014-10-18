@@ -203,7 +203,14 @@ MainFrame::on_run (wxCommandEvent& event) {
 void
 MainFrame::run () {
   update_core_settings();
-  core.exec_script(code_editor->GetValue().c_str());
+  
+  auto selected_text = code_editor->GetSelectedText().ToStdString();
+  
+  if (selected_text.size() != 0) {
+    core.exec_script(selected_text.c_str());
+  } else {
+    core.exec_script(code_editor->GetValue().c_str());
+  }
 }
 
 void 
