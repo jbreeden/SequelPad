@@ -52,6 +52,7 @@ MainFrame::initialize () {
   TEXT_CTRL(password_textctrl, core.getPassword())
 #undef TEXT_CTRL
 
+  status_bar = XRCCTRL(*this, "status_bar", wxStatusBar);
   db_tree_ctrl = XRCCTRL(*this, "db_tree_ctrl", wxTreeCtrl);
   db_tree_ctrl->AddRoot("Not Connected");
   connect_button = XRCCTRL(*this, "connect_button", wxButton);
@@ -253,11 +254,12 @@ MainFrame::on_open (wxCommandEvent& event) {
     wxFD_OPEN|wxFD_FILE_MUST_EXIST);
   try {
     if (wxID_OK == dialog.ShowModal()) {
-      auto file_name = (dialog.GetDirectory() + "/" + dialog.GetFilename()).ToStdString();
+      current_file = (dialog.GetDirectory() + "\\" + dialog.GetFilename()).ToStdString();
       ifstream in;
-      in.open(file_name);
+      in.open(current_file);
       string script((istreambuf_iterator<char>(in)), istreambuf_iterator<char>());
       code_editor->SetValue(script);
+      status_bar->SetStatusText("File: " + current_file);
       in.close();
     }
   } catch (...) {
@@ -272,14 +274,18 @@ MainFrame::on_save (wxCommandEvent& event) {
     "Save Script", 
     "", // default dir
     "", // default file
-    "Ruby Files (*.rb)|*.rb",
+    "Ruby Files (*.rb)|*.rb|All Files (*.*)|*.*",
     wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
   try {
+    if (current_file.size() != 0) {
+      dialog.SetPath(current_file);
+    }
     if (wxID_OK == dialog.ShowModal()) {
-      auto file_name = (dialog.GetDirectory() + "/" + dialog.GetFilename()).ToStdString();
+      current_file = (dialog.GetDirectory() + "\\" + dialog.GetFilename()).ToStdString();
+      status_bar->SetStatusText("File: " + current_file);
       ofstream out;
-      out.open(file_name);
-      auto contents = code_editor->GetValue().ToStdString();
+      out.open(current_file);
+      string contents = code_editor->GetValue().ToStdString();
       for (int i = 0; i < contents.size(); ++i) {
         if (contents[i] == '\r') continue;
         out << contents[i];

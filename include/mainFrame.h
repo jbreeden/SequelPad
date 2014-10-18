@@ -1,6 +1,7 @@
 #ifndef MAINFRAME_H
 #define MAINFRAME_H
 
+#include <string>
 #include "wx/wx.h"
 #include "wx/frame.h"
 #include "wx/grid.h"
@@ -39,6 +40,7 @@ private:
   bool connected;
   
   // Widgets
+  wxStatusBar* status_bar;
   wxTextCtrl* host_textctrl;
   wxTextCtrl* port_textctrl;
   wxTextCtrl* database_textctrl;
@@ -50,6 +52,8 @@ private:
   wxButton* connect_button;
   wxListBox* table_listbox;
   wxTreeCtrl* db_tree_ctrl;
+  std::string current_file;
+  
   
   void create_code_editor();
   void style_code_editor();

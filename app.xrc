@@ -282,6 +282,10 @@
 				</object>
 			</object>
 		</object>
+		<object class="wxStatusBar" name="status_bar">
+			<style>wxST_SIZEGRIP</style>
+			<fields>1</fields>
+		</object>
 	</object>
 	<object class="wxMenu" name="table_menu">
 		<label>MyMenu</label>
